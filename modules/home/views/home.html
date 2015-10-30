@@ -1,0 +1,128 @@
+﻿<hr class="tophr">
+<div class="infobar">
+  <p>Welcome <b>{{meta.fullname}}</b> | env : <b>{{meta.env}}</b> | numusers : <b>{{meta.numusers}}</b> | upsince : <b>{{meta.upsince}}</b> | operator : <b>{{meta.operator}}</b> | <a ng-click="killHome()">Logout</a></p>
+</div>
+<hr class="tophr">
+<div>
+  <uib-tabset>
+    <uib-tab heading="alerts" deselect="stopFetchAlerts();">
+      <uib-tabset>
+	<uib-tab heading="Most recent alerts" select="fetchAlerts();" deselect="stopFetchAlerts();" active="alerts.alertslistEnable">
+
+<!--
+type ROW struct {                                                                                                                                                                                                  
+        Subtab       string
+        Level        string
+	Subject      string
+	Escalate     string
+	Escalatemin1 string
+	Escalatemin2 string
+	Subjectnum   string
+	Doneat       string
+	Openat       string
+	Owner        string
+	Assigner     string
+	Status       string
+	Comment      string
+}       
+-->
+	  <button type="button" class="btn btn-success btn-sm" ng-click="fetchAlerts();">Refresh Alerts list</button>
+	  <table class="alerts">
+	    <tr class="alertsheader">
+	      <th>Controls</th>
+	      <th>Level</th>
+	      <th>Owner</th>
+	      <th>Status</th>
+	      <th>Subject</th>
+	      <th>Openat</th>
+	      <th>Esc</th>
+	      <th>Escmin1</th>
+	      <th>Escmin2</th>
+	      <th>Assigner</th>
+	      <th>Comment</th>
+	    </tr>
+	    <tr ng-repeat="alertrow in alerts.alertrows" class="alertlist">
+	      <td>
+		<button type="button" class="btn btn-primary btn-sm" ng-click="ownAlert(alertrow.Openat, alertrow.Subject)">Own</button>
+		<button type="button" class="btn btn-primary btn-sm" ng-click="openEditAlertTab(alertrow)">Edit</button>
+	      </td>
+	      <td>{{alertrow.Level}}</td>
+	      <td>{{alertrow.Owner}}</td>
+	      <td>{{alertrow.Status}}</td>
+	      <td>{{alertrow.Subject}}</td>
+	      <td>{{alertrow.Openat | date : 'yyyyMMdd HHmmss'}}</td>
+	      <td>{{alertrow.Escalate}}</td>
+	      <td>{{alertrow.Escalatemin1}}</td>
+	      <td>{{alertrow.Escalatemin2}}</td>
+	      <td>{{alertrow.Assigner}}</td>
+	      <td>{{alertrow.Comment}}</td>
+	    </tr>
+	  </table>
+	</uib-tab>
+	<uib-tab heading="Edit the selected alert" disable="!alerts.editalertEnable" active="alerts.editalertEnable" select="fetchUserList()">
+	  
+	  <table class="editalerts" cellspacing="10px">
+	    <tr class="alertsheader">
+	      <th>Field</th>
+	      <th>Edit field</th>
+	    </tr>
+	    <tr>
+	      <td>Assign to</td>
+	      <td>
+		<div class="btn-group" uib-dropdown>
+		  <button id="single-button" type="button" class="btn btn-primary" uib-dropdown-toggle>
+		    {{alerts.editalert.ownerFullName}} <span class="caret"></span>
+		  </button>
+		  <ul class="uib-dropdown-menu" role="menu" aria-labelledby="single-button">
+		    <li ng-repeat="(user, fullname) in meta.usermap" role="menuitem">
+		      <a ng-click="alerts.editalert.owner = user; alerts.editalert.ownerFullName = fullname;">{{fullname}}</a>
+		    </li>
+		  </ul>
+		</div>
+	      </td>
+	    </tr>
+	    <tr>
+	      <td>Status</td>
+	      <td>
+		<div class="btn-group" uib-dropdown>
+		  <button id="single-button" type="button" class="btn btn-primary" uib-dropdown-toggle>
+		    {{alerts.editalert.status}} <span class="caret"></span>
+		  </button>
+		  <ul class="uib-dropdown-menu" role="menu" aria-labelledby="single-button">
+		    <li role="menuitem"><a ng-click="alerts.editalert.status = 'owned'">owned</a></li>
+		    <li role="menuitem"><a ng-click="alerts.editalert.status = 'closed'">closed</a></li>
+		  </ul>
+		</div>
+	      </td>
+	    </tr>
+	    <tr>
+	      <td>Comment</td>
+	      <td><input type="text" name="comment" placeholder="Enter comments" ng-model="alerts.editalert.comment" width="100%"></td>
+	    </tr>
+	  </table>
+	  <!--<p>{{alerts.editalert}}</p>-->
+	  <br><br>
+	  <button type="button" class="btn btn-primary btn-sm" ng-click="updateAlert()">Update Alert</button>
+	  <button type="button" class="btn btn-primary btn-sm" ng-click="closeEditAlertTab()">Close Edit Tab</button>
+	  <br><br>
+	  <p>{{alerts.editalert.errorMessage}}</p>
+	</uib-tab>
+      </uib-tabset>
+    </uib-tab>
+    <uib-tab heading="ops" ng-click="fetchOpsHistory()">
+      <br><br>
+      <button type="button" class="btn btn-primary btn-sm" ng-click="takeOver()">Take over now</button>
+      <br>
+      <p>{{takeoverError}}</p>
+      <h4>Ops takeover history</h4>
+      <table class="alerts">
+	<tr class="alertsheader">
+	  <th>Operator name</th><th>Taken over at</th>
+	</tr>
+	<tr ng-repeat="opsrow in ops.history" class="alertlist">
+	  <td>{{opsrow.Opsname}}</td><td>{{opsrow.Takenoverat | date : 'yyyyMMdd HHmmss'}}</td>
+	</tr>
+      </table>
+    </uib-tab>
+  </uib-tabset>
+</div>
